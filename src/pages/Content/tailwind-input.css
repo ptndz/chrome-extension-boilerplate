@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.ptn1411-draggable-button {
+  width: 60px;
+  height: 60px;
+  background-color: #d45676;
+  border-radius: 50%;
+  position: fixed; /* Thay đổi từ absolute sang fixed */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: grab;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s;
+  user-select: none; /* Ngăn chặn chọn text khi kéo */
+  z-index: 1000; /* Đảm bảo nút nằm trên cùng */
+}
+
+.ptn1411-draggable-button:active {
+  cursor: grabbing;
+  background-color: #eb6541;
+}
+
+.ptn1411-draggable-button span {
+  pointer-events: none; /* Đảm bảo không bị ảnh hưởng khi kéo */
+}
+.ptn1411-draggable-button.ptn1411-dragging {
+  transform: scale(1.1);
+  opacity: 0.8;
+}
+.ptn1411-custom-context-menu {
+  position: fixed;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  list-style: none;
+  margin: 0;
+  z-index: 1001; /* Đảm bảo menu nằm trên cùng */
+  width: 200px;
+}
+.ptn1411-custom-context-menu .ptn1411-menu-item {
+  padding: 8px 16px;
+  cursor: pointer;
+  padding-left: 30px;
+}
+
+.ptn1411-custom-context-menu .ptn1411-menu-item:hover,
+.ptn1411-custom-context-menu .ptn1411-menu-item:focus {
+  background-color: #f0f0f0;
+  outline: none;
+}
