@@ -1,5 +1,6 @@
 import React, { forwardRef, Ref, useEffect, useRef } from 'react';
 import { Label } from './ui/label';
+
 interface ContextMenuProps {
   position: { x: number; y: number };
   onClose: () => void;
@@ -63,36 +64,38 @@ const ContextMenu = forwardRef<HTMLUListElement, ContextMenuProps>(
     };
 
     return (
-      <ul
-        ref={menuRef}
-        className="ptn1411-custom-context-menu"
-        style={{ top: position.y, left: position.x }}
-        role="menu"
-        aria-label="Context menu"
-      >
-        <div className="flex justify-center">
-          <Label className="text-xl">Menu</Label>
-        </div>
+      <>
+        <ul
+          ref={menuRef}
+          className="ptn1411-custom-context-menu"
+          style={{ top: position.y, left: position.x }}
+          role="menu"
+          aria-label="Context menu"
+        >
+          <div className="flex justify-center">
+            <Label className="text-xl">Menu</Label>
+          </div>
 
-        {['Add bookmark', 'Option 2', 'Option 3'].map((option, index) => (
-          <li
-            key={option}
-            className="ptn1411-menu-item"
-            role="menuitem"
-            tabIndex={0}
-            onClick={() => onSelect(option)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                onSelect(option);
-              } else {
-                handleMenuItemKeyDown(e, index, 3);
-              }
-            }}
-          >
-            {option}
-          </li>
-        ))}
-      </ul>
+          {['Add bookmark', 'Search', 'Option 3'].map((option, index) => (
+            <li
+              key={option}
+              className="ptn1411-menu-item"
+              role="menuitem"
+              tabIndex={0}
+              onClick={() => onSelect(option)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  onSelect(option);
+                } else {
+                  handleMenuItemKeyDown(e, index, 3);
+                }
+              }}
+            >
+              {option}
+            </li>
+          ))}
+        </ul>
+      </>
     );
   }
 );

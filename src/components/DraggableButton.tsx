@@ -1,11 +1,28 @@
+import { instantMeiliSearch } from '@meilisearch/instant-meilisearch';
 import html2canvas from 'html2canvas';
+import 'instantsearch.css/themes/satellite.css';
 import React, { useEffect, useRef, useState } from 'react';
+import { InstantSearch, SearchBox } from 'react-instantsearch';
 import { LogoIcon } from '../assets/icons/logo';
 import { useStorage } from '../lib/shared';
 import { draggableButtonPositionStorage, type Position } from '../lib/storage';
 import { saveBookmark } from '../services';
 import { uploadFile } from '../services/media';
 import ContextMenuRight from './ContextMenuRight';
+import CustomInfiniteHits from './CustomInfiniteHits';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from './ui/dialog';
+import { ScrollArea } from './ui/scroll-area';
+const { searchClient } = instantMeiliSearch(
+  'http://localhost:7700',
+  '6c57f1f5582cebf209fd4ac1b9f401d000ac52ba0d533b32eb409658ba0e7be1'
+);
+
 type Props = {
   handleClick: () => void;
 };
@@ -16,7 +33,7 @@ interface MenuPosition {
 const DraggableButton: React.FC<Props> = ({ handleClick }) => {
   const buttonRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLUListElement>(null);
-
+  const [openDialog, setOpenDialog] = useState(false);
   const draggableButtonPosition = useStorage(draggableButtonPositionStorage);
   // Khởi tạo vị trí từ localStorage hoặc mặc định
 
@@ -178,18 +195,22 @@ const DraggableButton: React.FC<Props> = ({ handleClick }) => {
   // Handler khi nhấp vào một tùy chọn trong menu
   const handleMenuItemClick = async (action: string) => {
     setIsMenuVisible(false);
-    const image = await captureScreenshot();
-    const page = getWebInfo();
-    let image2 = '';
-    if (image) {
-      const media = await uploadFile(image);
-      image2 = media[0].url ? media[0].url : page.image;
+    if (action === 'Add bookmark') {
+      const image = await captureScreenshot();
+      const page = getWebInfo();
+      let image2 = '';
+      if (image) {
+        const media = await uploadFile(image);
+        image2 = media[0].url ? media[0].url : page.image;
+      }
+
+      page.image = image2;
+      console.log(page);
+
+      await saveBookmark(page);
+    } else if (action === 'Search') {
+      setOpenDialog(true);
     }
-
-    page.image = image2;
-    console.log(page);
-
-    await saveBookmark(page);
   };
   const getWebInfo = () => {
     const title = document.title;
@@ -247,7 +268,9 @@ const DraggableButton: React.FC<Props> = ({ handleClick }) => {
         console.error('Lỗi khi chụp màn hình:', error);
       });
   };
-
+  function handCLick(hit: any) {
+    console.log(hit);
+  }
   return (
     <>
       <div
@@ -276,6 +299,22 @@ const DraggableButton: React.FC<Props> = ({ handleClick }) => {
           onSelect={handleMenuItemClick}
         />
       )}
+      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+        <DialogContent className="sm:max-w-[900px] h-3/4 bg-white">
+          <DialogHeader>
+            <DialogTitle>Search</DialogTitle>
+            <DialogDescription>
+              Make changes to your profile here. Click save when you're done.
+            </DialogDescription>
+          </DialogHeader>
+          <InstantSearch indexName="bookmarks" searchClient={searchClient}>
+            <SearchBox placeholder="Search" autoFocus />
+            <ScrollArea className="h-[99.333333%] rounded-md border">
+              <CustomInfiniteHits handClick={handCLick} />
+            </ScrollArea>
+          </InstantSearch>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
